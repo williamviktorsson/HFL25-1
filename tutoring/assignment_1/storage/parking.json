@@ -1,0 +1,10 @@
+[
+    {
+        "vehicleId": 1,
+        "streetId": 1
+    },
+    {
+        "vehicleId": 2,
+        "streetId": 2
+    }
+]
