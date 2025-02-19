@@ -1,0 +1,1 @@
+# Referensimplementationer med hjälp av 4 olika alternativa strategier för persistent datalagring
