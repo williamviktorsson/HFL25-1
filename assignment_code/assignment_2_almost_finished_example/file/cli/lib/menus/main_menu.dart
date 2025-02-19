@@ -6,7 +6,7 @@ import 'package:cli/menus/items_menu.dart';
 
 class MainMenu {
   static Future prompt() async {
-    clearConsole();
+    Console.clear();
 
     while (true) {
       // clear the console
@@ -16,7 +16,7 @@ class MainMenu {
       print('1. Manage Items');
       print('2. Manage Bags');
       print('3. Exit');
-      var input = choice();
+      var input = Console.choice();
       switch (input) {
         case 1:
           await ItemsMenu.prompt();

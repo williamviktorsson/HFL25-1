@@ -5,7 +5,7 @@ import 'package:cli/utils/console.dart';
 
 class BagsMenu {
   static Future prompt() async {
-    clearConsole();
+    Console.clear();
     while (true) {
       print('Bags Menu');
       print('1. Create Bag');
@@ -14,7 +14,7 @@ class BagsMenu {
       print('4. Delete Bag');
       print('5. Back to Main Menu');
 
-      var input = choice();
+      var input = Console.choice();
 
       switch (input) {
         case 1:

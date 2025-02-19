@@ -4,9 +4,11 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-class BagRepository implements RepositoryInterface<Bag, String> {
+
+class BagRepository implements RepositoryInterface<Bag> {
+
   @override
-  getById(String id) async {
+  Future<Bag> getById(String id) async {
     final uri = Uri.parse("http://localhost:8080/bags/${id}");
 
     Response response = await http.get(
@@ -16,11 +18,11 @@ class BagRepository implements RepositoryInterface<Bag, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Bag.fromJson(json));
+    return Bag.fromJson(json);
   }
 
   @override
-  create(Bag bag) async {
+  Future<Bag> create(Bag bag) async {
     // send bag serialized as json over http to server at localhost:8080
     final uri = Uri.parse("http://localhost:8080/bags");
 
@@ -30,11 +32,11 @@ class BagRepository implements RepositoryInterface<Bag, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Bag.fromJson(json));
+    return Bag.fromJson(json);
   }
 
   @override
-  getAll() async {
+  Future<List<Bag>> getAll() async {
     final uri = Uri.parse("http://localhost:8080/bags");
     final response = await http.get(
       uri,
@@ -43,12 +45,11 @@ class BagRepository implements RepositoryInterface<Bag, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(
-        value: (json as List).map((bag) => Bag.fromJson(bag)).toList());
+    return (json as List).map((bag) => Bag.fromJson(bag)).toList();
   }
 
   @override
-  delete(String id) async {
+  Future<Bag> delete(String id) async {
     final uri = Uri.parse("http://localhost:8080/bags/${id}");
 
     Response response = await http.delete(
@@ -58,11 +59,11 @@ class BagRepository implements RepositoryInterface<Bag, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Bag.fromJson(json));
+    return Bag.fromJson(json);
   }
 
   @override
-  update(String id, Bag bag) async {
+  Future<Bag> update(String id, Bag bag) async {
     // send bag serialized as json over http to server at localhost:8080
     final uri = Uri.parse("http://localhost:8080/bags/${id}");
 
@@ -72,6 +73,6 @@ class BagRepository implements RepositoryInterface<Bag, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Bag.fromJson(json));
+    return Bag.fromJson(json);
   }
 }

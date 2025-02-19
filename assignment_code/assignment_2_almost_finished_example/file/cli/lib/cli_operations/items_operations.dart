@@ -22,75 +22,55 @@ class ItemsOperations {
   }
 
   static Future list() async {
-    var result = await repository.getAll();
-
-    switch (result) {
-      case Success<List<Item>, String>(:var data):
-        for (int i = 0; i < data.length; i++) {
-          print('${i + 1}. ${data[i].description}');
-        }
-      case Failure(:var error):
-        print(error);
+    List<Item> allItems = await repository.getAll();
+    for (int i = 0; i < allItems.length; i++) {
+      print('${i + 1}. ${allItems[i].description}');
     }
   }
 
   static Future update() async {
-    var result = await repository.getAll();
+    print('Pick an index to update: ');
+    List<Item> allItems = await repository.getAll();
+    for (int i = 0; i < allItems.length; i++) {
+      print('${i + 1}. ${allItems[i].description}');
+    }
 
-    switch (result) {
-      case Success<List<Item>, String>(:var data):
-        print('Pick an index to update: ');
-        List<Item> allItems = data;
-        for (int i = 0; i < allItems.length; i++) {
-          print('${i + 1}. ${allItems[i].description}');
-        }
+    String? input = stdin.readLineSync();
 
-        String? input = stdin.readLineSync();
+    if (Validator.isIndex(input, allItems)) {
+      int index = int.parse(input!) - 1;
+      Item item = allItems[index];
 
-        if (Validator.isIndex(input, allItems)) {
-          int index = int.parse(input!) - 1;
-          Item item = allItems[index];
+      print('Enter new description: ');
+      var description = stdin.readLineSync();
 
-          print('Enter new description: ');
-          var description = stdin.readLineSync();
-
-          if (Validator.isString(description)) {
-            item.description = description!;
-            await repository.update(allItems[index].id, item);
-            print('Item updated');
-          } else {
-            print('Invalid input');
-          }
-        } else {
-          print('Invalid input');
-        }
-      case Failure(:var error):
-        print(error);
+      if (Validator.isString(description)) {
+        item.description = description!;
+        await repository.update(allItems[index].id, item);
+        print('Item updated');
+      } else {
+        print('Invalid input');
+      }
+    } else {
+      print('Invalid input');
     }
   }
 
   static Future delete() async {
-    var result = await repository.getAll();
+    print('Pick an index to delete: ');
+    List<Item> allItems = await repository.getAll();
+    for (int i = 0; i < allItems.length; i++) {
+      print('${i + 1}. ${allItems[i].description}');
+    }
 
-    switch (result) {
-      case Success<List<Item>, String>(:var data):
-        print('Pick an index to delete: ');
-        List<Item> allItems = data;
-        for (int i = 0; i < allItems.length; i++) {
-          print('${i + 1}. ${allItems[i].description}');
-        }
+    String? input = stdin.readLineSync();
 
-        String? input = stdin.readLineSync();
-
-        if (Validator.isIndex(input, allItems)) {
-          int index = int.parse(input!) - 1;
-          await repository.delete(allItems[index].id);
-          print('Item deleted');
-        } else {
-          print('Invalid input');
-        }
-      case Failure(:var error):
-        print(error);
+    if (Validator.isIndex(input, allItems)) {
+      int index = int.parse(input!) - 1;
+      await repository.delete(allItems[index].id);
+      print('Item deleted');
+    } else {
+      print('Invalid input');
     }
   }
 }

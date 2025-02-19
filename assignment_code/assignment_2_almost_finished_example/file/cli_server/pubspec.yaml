@@ -13,6 +13,7 @@ dependencies:
   shelf_router: ^1.1.0
   cli_shared: 
     path: '../cli_shared'
+  equatable: ^2.0.7
 
 dev_dependencies:
   http: ^1.1.0

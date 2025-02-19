@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cli_server/models/bag_entity.dart';
 import 'package:cli_shared/cli_shared.dart';
-import 'package:cli_server/models/bag.dart';
 
-class BagRepository implements RepositoryInterface<Bag, String> {
+class BagRepository implements RepositoryInterface<Bag> {
   String path = "./bags.json";
 
   @override
-  Future<Result<Bag, String>> create(bag) async {
+  Future<Bag> create(bag) async {
     File file = File(path);
 
     try {
@@ -24,19 +24,19 @@ class BagRepository implements RepositoryInterface<Bag, String> {
 
       var json = jsonDecode(content) as List;
 
-      json = [...json, BagFactory.toJsonServer(bag)];
+      json = [...json, bag.toBagEntity().toJson()];
 
       await file.writeAsString(jsonEncode(json));
     } catch (e) {
       // TODO: Log error information so Dennis can check it later
-      return Result.failure(reason: "failed to write bag to database");
+      throw Exception("Error writing to file");
     }
 
-    return Result.success(value: bag);
+    return bag;
   }
 
   @override
-  Future<Result<Bag, String>> getById(String id) async {
+  Future<Bag> getById(String id) async {
     File file = File(path);
 
     try {
@@ -44,25 +44,20 @@ class BagRepository implements RepositoryInterface<Bag, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
-      return Result.failure(reason: "file already exists");
+      // dont try to create a database file if it exists.
     }
 
-    String content = await file.readAsString();
-
-    List<Bag> bags = await Future.wait((jsonDecode(content) as List)
-        .map((json) => BagFactory.fromJsonServer(json))
-        .toList());
+    List<Bag> bags = await getAll();
 
     for (var bag in bags) {
       if (bag.id == id) {
-        return Result.success(value: bag);
+        return bag;
       }
     }
-    return Result.failure(reason: "no bag found with id ${id}");
+    throw Exception("No bag found with id ${id}");
   }
 
-  @override
-  Future<Result<List<Bag>, String>> getAll() async {
+  Future<List<BagEntity>> _getAllEntities() async {
     File file = File(path);
 
     try {
@@ -70,19 +65,30 @@ class BagRepository implements RepositoryInterface<Bag, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
+      // dont try to create a database file if it exists.
     }
 
     String content = await file.readAsString();
 
-    List<Bag> bags = await Future.wait((jsonDecode(content) as List)
-        .map((json) => BagFactory.fromJsonServer(json))
-        .toList());
+    List<BagEntity> bags = (jsonDecode(content) as List)
+        .map((json) => BagEntity.fromJson(json))
+        .toList();
 
-    return Result.success(value: bags);
+    return bags;
   }
 
   @override
-  Future<Result<Bag, String>> update(String id, Bag newBag) async {
+  Future<List<Bag>> getAll() async {
+    var entities = await _getAllEntities();
+
+    List<Bag> bags =
+        await Future.wait(entities.map((entity) => entity.toBag()).toList());
+
+    return bags;
+  }
+
+  @override
+  Future<Bag> update(String id, Bag newBag) async {
     File file = File(path);
 
     try {
@@ -90,30 +96,27 @@ class BagRepository implements RepositoryInterface<Bag, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
+      // dont try to create a database file if it exists.
     }
 
-    String content = await file.readAsString();
+    var entities = await _getAllEntities();
 
-    List<Bag> bags = await Future.wait((jsonDecode(content) as List)
-        .map((json) => BagFactory.fromJsonServer(json))
-        .toList());
+    for (var i = 0; i < entities.length; i++) {
+      if (entities[i].id == id) {
+        entities[i] = newBag.toBagEntity();
 
-    for (var i = 0; i < bags.length; i++) {
-      if (bags[i].id == id) {
-        bags[i] = newBag;
+        await file.writeAsString(
+            jsonEncode(entities.map((bag) => bag.toJson()).toList()));
 
-        await file.writeAsString(jsonEncode(
-            bags.map((bag) => BagFactory.toJsonServer(bag)).toList()));
-
-        return Result.success(value: newBag);
+        return newBag;
       }
     }
 
-    return Result.failure(reason: "no bag found with id ${id}");
+    throw Exception("No bag found with id ${id}");
   }
 
   @override
-  Future<Result<Bag, String>> delete(String id) async {
+  Future<Bag> delete(String id) async {
     File file = File(path);
 
     try {
@@ -121,23 +124,20 @@ class BagRepository implements RepositoryInterface<Bag, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
+      // dont try to create a database file if it exists.
     }
 
-    String content = await file.readAsString();
+    var entities = await _getAllEntities();
 
-    List<Bag> bags = await Future.wait((jsonDecode(content) as List)
-        .map((json) => BagFactory.fromJsonServer(json))
-        .toList());
-
-    for (var i = 0; i < bags.length; i++) {
-      if (bags[i].id == id) {
-        final bag = bags.removeAt(i);
-        await file.writeAsString(jsonEncode(
-            bags.map((bag) => BagFactory.toJsonServer(bag)).toList()));
-        return Result.success(value: bag);
+    for (var i = 0; i < entities.length; i++) {
+      if (entities[i].id == id) {
+        final entity = entities.removeAt(i);
+        await file.writeAsString(
+            jsonEncode(entities.map((bag) => bag.toJson()).toList()));
+        return await entity.toBag();
       }
     }
 
-    return Result.failure(reason: "no bag found with id ${id}");
+    throw Exception("No bag found with id ${id}");
   }
 }

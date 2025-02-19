@@ -4,9 +4,10 @@ import 'package:cli_shared/cli_shared.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-class ItemRepository implements RepositoryInterface<Item, String> {
+
+class ItemRepository implements RepositoryInterface<Item> {
   @override
-  getById(String id) async {
+  Future<Item> getById(String id) async {
     final uri = Uri.parse("http://localhost:8080/items/${id}");
 
     Response response = await http.get(
@@ -16,11 +17,11 @@ class ItemRepository implements RepositoryInterface<Item, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Item.fromJson(json));
+    return Item.fromJson(json);
   }
 
   @override
-  create(Item item) async {
+  Future<Item> create(Item item) async {
     // send item serialized as json over http to server at localhost:8080
     final uri = Uri.parse("http://localhost:8080/items");
 
@@ -30,11 +31,11 @@ class ItemRepository implements RepositoryInterface<Item, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Item.fromJson(json));
+    return Item.fromJson(json);
   }
 
   @override
-  getAll() async {
+  Future<List<Item>> getAll() async {
     final uri = Uri.parse("http://localhost:8080/items");
     final response = await http.get(
       uri,
@@ -43,12 +44,11 @@ class ItemRepository implements RepositoryInterface<Item, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(
-        value: (json as List).map((item) => Item.fromJson(item)).toList());
+    return (json as List).map((item) => Item.fromJson(item)).toList();
   }
 
   @override
-  delete(String id) async {
+  Future<Item> delete(String id) async {
     final uri = Uri.parse("http://localhost:8080/items/${id}");
 
     Response response = await http.delete(
@@ -58,11 +58,11 @@ class ItemRepository implements RepositoryInterface<Item, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Item.fromJson(json));
+    return Item.fromJson(json);
   }
 
   @override
-  update(String id, Item item) async {
+  Future<Item> update(String id, Item item) async {
     // send item serialized as json over http to server at localhost:8080
     final uri = Uri.parse("http://localhost:8080/items/${id}");
 
@@ -72,6 +72,6 @@ class ItemRepository implements RepositoryInterface<Item, String> {
 
     final json = jsonDecode(response.body);
 
-    return Result.success(value: Item.fromJson(json));
+    return Item.fromJson(json);
   }
 }

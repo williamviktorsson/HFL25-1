@@ -12,55 +12,35 @@ Future<Response> postItemHandler(Request request) async {
   final json = jsonDecode(data);
   var item = Item.fromJson(json);
 
-  var result = await repo.create(item);
+  item = await repo.create(item);
 
-  switch (result) {
-    case Success(data: var item):
-      return Response.ok(
-        jsonEncode(item),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-    case Failure(error: var error):
-      return Response.badRequest(body: error);
-  }
+  return Response.ok(
+    jsonEncode(item),
+    headers: {'Content-Type': 'application/json'},
+  );
 }
 
 Future<Response> getItemsHandler(Request request) async {
-  final result = await repo.getAll();
+  final items = await repo.getAll();
 
-  switch (result) {
-    case Success(data: var items):
-      final payload = items.map((e) => e.toJson()).toList();
+  final payload = items.map((e) => e.toJson()).toList();
 
-      print(payload);
-
-      return Response.ok(
-        jsonEncode(payload),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-    case Failure(error: var error):
-      return Response.badRequest(body: error);
-  }
+  return Response.ok(
+    jsonEncode(payload),
+    headers: {'Content-Type': 'application/json'},
+  );
 }
 
 Future<Response> getItemHandler(Request request) async {
   String? id = request.params["id"];
 
   if (id != null) {
-    var result = await repo.getById(id);
+    var item = await repo.getById(id);
 
-    switch (result) {
-      case Success(data: var item):
-        return Response.ok(
-          jsonEncode(item),
-          headers: {'Content-Type': 'application/json'},
-        );
-
-      case Failure(error: var error):
-        return Response.badRequest(body: error);
-    }
+    return Response.ok(
+      jsonEncode(item),
+      headers: {'Content-Type': 'application/json'},
+    );
   }
 
   // do better handling
@@ -74,18 +54,12 @@ Future<Response> updateItemHandler(Request request) async {
     final data = await request.readAsString();
     final json = jsonDecode(data);
     Item? item = Item.fromJson(json);
-    var result = await repo.update(id, item);
+    item = await repo.update(id, item);
 
-    switch (result) {
-      case Success(data: var item):
-        return Response.ok(
-          jsonEncode(item),
-          headers: {'Content-Type': 'application/json'},
-        );
-
-      case Failure(error: var error):
-        return Response.badRequest(body: error);
-    }
+    return Response.ok(
+      jsonEncode(item),
+      headers: {'Content-Type': 'application/json'},
+    );
   }
 
   // TODO: do better handling
@@ -96,18 +70,12 @@ Future<Response> deleteItemHandler(Request request) async {
   String? id = request.params["id"];
 
   if (id != null) {
-    var result = await repo.delete(id);
+    var item = await repo.delete(id);
 
-    switch (result) {
-      case Success(data: var item):
-        return Response.ok(
-          jsonEncode(item),
-          headers: {'Content-Type': 'application/json'},
-        );
-
-      case Failure(error: var error):
-        return Response.badRequest(body: error);
-    }
+    return Response.ok(
+      jsonEncode(item),
+      headers: {'Content-Type': 'application/json'},
+    );
   }
 
   // TODO: do better handling

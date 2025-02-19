@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cli_server/router_config.dart';
 import 'package:cli_shared/cli_shared.dart';
 
-class ItemRepository implements RepositoryInterface<Item, String> {
-  String path = "./items.json";
+class ItemRepository implements RepositoryInterface<Item> {
+  final String path = "./items.json";
+
+  const ItemRepository();
 
   @override
-  Future<Result<Item, String>> create(item) async {
+  Future<Item> create(item) async {
     File file = File(path);
 
     try {
@@ -29,14 +30,14 @@ class ItemRepository implements RepositoryInterface<Item, String> {
       await file.writeAsString(jsonEncode(json));
     } catch (e) {
       // TODO: Log error information so Dennis can check it later
-      return Result.failure(reason: "failed to write item to database");
+      throw Exception("Error writing to file");
     }
 
-    return Result.success(value: item);
+    return item;
   }
 
   @override
-  Future<Result<Item, String>> getById(String id) async {
+  Future<Item> getById(String id) async {
     File file = File(path);
 
     try {
@@ -44,7 +45,7 @@ class ItemRepository implements RepositoryInterface<Item, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
-      return Result.failure(reason: "file already exists");
+      // dont try to create a database file if it exists.
     }
 
     String content = await file.readAsString();
@@ -55,14 +56,14 @@ class ItemRepository implements RepositoryInterface<Item, String> {
 
     for (var item in items) {
       if (item.id == id) {
-        return Result.success(value: item);
+        return item;
       }
     }
-    return Result.failure(reason: "no item found with id ${id}");
+    throw Exception("No item found with id ${id}");
   }
 
   @override
-  Future<Result<List<Item>, String>> getAll() async {
+  Future<List<Item>> getAll() async {
     File file = File(path);
 
     try {
@@ -70,6 +71,7 @@ class ItemRepository implements RepositoryInterface<Item, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
+      // dont try to create a database file if it exists.
     }
 
     String content = await file.readAsString();
@@ -78,11 +80,11 @@ class ItemRepository implements RepositoryInterface<Item, String> {
         .map((json) => Item.fromJson(json))
         .toList();
 
-    return Result.success(value: items);
+    return items;
   }
 
   @override
-  Future<Result<Item, String>> update(String id, Item newItem) async {
+  Future<Item> update(String id, Item newItem) async {
     File file = File(path);
 
     try {
@@ -90,6 +92,7 @@ class ItemRepository implements RepositoryInterface<Item, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
+      // dont try to create a database file if it exists.
     }
 
     String content = await file.readAsString();
@@ -105,15 +108,15 @@ class ItemRepository implements RepositoryInterface<Item, String> {
         await file.writeAsString(
             jsonEncode(items.map((item) => item.toJson()).toList()));
 
-        return Result.success(value: newItem);
+        return newItem;
       }
     }
 
-    return Result.failure(reason: "no item found with id ${id}");
+    throw Exception("No item found with id ${id}");
   }
 
   @override
-  Future<Result<Item, String>> delete(String id) async {
+  Future<Item> delete(String id) async {
     File file = File(path);
 
     try {
@@ -121,6 +124,7 @@ class ItemRepository implements RepositoryInterface<Item, String> {
       await file.writeAsString(jsonEncode([]));
     } catch (e) {
       // file already exists
+      // dont try to create a database file if it exists.
     }
 
     String content = await file.readAsString();
@@ -134,10 +138,10 @@ class ItemRepository implements RepositoryInterface<Item, String> {
         final item = items.removeAt(i);
         await file.writeAsString(
             jsonEncode(items.map((item) => item.toJson()).toList()));
-        return Result.success(value: item);
+        return item;
       }
     }
 
-    return Result.failure(reason: "no item found with id ${id}");
+    throw Exception("No item found with id ${id}");
   }
 }

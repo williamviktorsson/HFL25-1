@@ -11,27 +11,22 @@ void main() {
   final host = 'http://localhost:$port';
 
   test('create_bag_repository', () async {
-    Bag bag = Bag(description: "description", brand: Brand(name: "name"));
+    Bag bag = Bag(description: "description");
 
     BagRepository().create(bag);
 
-    var result = await BagRepository().create(bag);
+    var returnedBag = await BagRepository().create(bag);
 
-    switch (result) {
-      case Success<Bag, String>(data: var returnedBag):
-        expect(
-          returnedBag,
-          bag,
-        );
-      case Failure<Bag, String>():
-        fail("bagrepository should return success on bag create");
-    }
+    expect(
+      returnedBag,
+      bag,
+    );
   });
 
   test('create_bag_handler', () async {
     final uri = Uri.parse("$host/bags");
 
-    Bag bag = Bag(description: "description", brand: Brand(name: "name"));
+    Bag bag = Bag(description: "description");
 
     Response response = await post(uri,
         headers: {'Content-Type': 'application/json'},

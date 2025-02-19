@@ -14,7 +14,7 @@ class BagsOperations {
     var input = stdin.readLineSync();
 
     if (Validator.isString(input)) {
-      Bag bag = Bag(description: input!, brand: Brand(name: "Boogle"));
+      Bag bag = Bag(description: input!);
       await repository.create(bag);
       print('Bag created');
     } else {
@@ -23,85 +23,62 @@ class BagsOperations {
   }
 
   static Future list() async {
-    var result = await repository.getAll();
-
-    switch (result) {
-      case Success(:var data):
-        for (int i = 0; i < data.length; i++) {
-          print(
-              '${i + 1}. ${data[i].description} - [${data[i].items.map((e) => e.description).join(', ')}]');
-        }
-        break;
-      case Failure(:var error):
-        print(error);
-        break;
+    List<Bag> allBags = await repository.getAll();
+    for (int i = 0; i < allBags.length; i++) {
+      print(
+          '${i + 1}. ${allBags[i].description} - [${allBags[i].items.map((e) => e.description).join(', ')}]');
     }
   }
 
   static Future update() async {
-    var result = await repository.getAll();
+    print('Pick an index to update: ');
+    List<Bag> allBags = await repository.getAll();
+    for (int i = 0; i < allBags.length; i++) {
+      print('${i + 1}. ${allBags[i].description}');
+    }
 
-    switch (result) {
-      case Success(:var data):
-        print('Pick an index to update: ');
-        List<Bag> allBags = data;
-        for (int i = 0; i < allBags.length; i++) {
-          print('${i + 1}. ${allBags[i].description}');
-        }
+    String? input = stdin.readLineSync();
 
-        String? input = stdin.readLineSync();
+    if (Validator.isIndex(input, allBags)) {
+      int index = int.parse(input!) - 1;
 
-        if (Validator.isIndex(input, allBags)) {
-          int index = int.parse(input!) - 1;
+      while (true) {
+        print("\n------------------------------------\n");
 
-          while (true) {
-            print("\n------------------------------------\n");
+        Bag bag = await repository.getById(allBags[index].id);
 
-            var result = await repository.getById(allBags[index].id);
+        print(
+            "What would you like to update in bag: ${bag.description} - [${bag.items.map((e) => e.description).join(", ")}]?");
+        print('1. Update description');
+        print('2. Add items to bag');
+        print('3. Remove items from bag');
 
-            switch (result) {
-              case Success(:var data):
-                Bag bag = data;
+        var input = stdin.readLineSync();
 
-                print(
-                    "What would you like to update in bag: ${bag.description} - [${bag.items.map((e) => e.description).join(", ")}]?");
-                print('1. Update description');
-                print('2. Add items to bag');
-                print('3. Remove items from bag');
+        if (Validator.isNumber(input)) {
+          int choice = int.parse(input!);
 
-                var input = stdin.readLineSync();
-
-                if (Validator.isNumber(input)) {
-                  int choice = int.parse(input!);
-
-                  switch (choice) {
-                    case 1:
-                      await _updateDescription(bag);
-                    case 2:
-                      await _addItemsToBag(bag);
-                    case 3:
-                      await _removeItemsFromBag(bag);
-                    default:
-                      print('Invalid choice');
-                  }
-                } else {
-                  print('Invalid input');
-                }
-                print("Would you like to update anything else? (y/n)");
-                input = stdin.readLineSync();
-                if (input == 'n') {
-                  break;
-                }
-              case Failure(:var error):
-                print(error);
-            }
+          switch (choice) {
+            case 1:
+              await _updateDescription(bag);
+            case 2:
+              await _addItemsToBag(bag);
+            case 3:
+              await _removeItemsFromBag(bag);
+            default:
+              print('Invalid choice');
           }
         } else {
           print('Invalid input');
         }
-
-      case Failure(:var error):
-        print(error);
+        print("Would you like to update anything else? (y/n)");
+        input = stdin.readLineSync();
+        if (input == 'n') {
+          break;
+        }
+      }
+    } else {
+      print('Invalid input');
     }
   }
 
@@ -121,29 +98,22 @@ class BagsOperations {
   static Future _addItemsToBag(Bag bag) async {
     // list all items and pick an item to add
 
-    var result = await ItemRepository().getAll();
+    var allItems = await ItemRepository().getAll();
+    print('Pick an item to add: ');
 
-    switch (result) {
-      case Success(:var data):
-        var allItems = data;
-        print('Pick an item to add: ');
+    for (int i = 0; i < allItems.length; i++) {
+      print('${i + 1}. ${allItems[i].description}');
+    }
 
-        for (int i = 0; i < allItems.length; i++) {
-          print('${i + 1}. ${allItems[i].description}');
-        }
+    var input = stdin.readLineSync();
 
-        var input = stdin.readLineSync();
-
-        if (Validator.isIndex(input, allItems)) {
-          int index = int.parse(input!) - 1;
-          bag.items.add(allItems[index]);
-          await repository.update(bag.id, bag);
-          print('Item added to bag');
-        } else {
-          print('Invalid input');
-        }
-      case Failure(:var error):
-        print(error);
+    if (Validator.isIndex(input, allItems)) {
+      int index = int.parse(input!) - 1;
+      bag.items.add(allItems[index]);
+      await repository.update(bag.id, bag);
+      print('Item added to bag');
+    } else {
+      print('Invalid input');
     }
   }
 
@@ -166,27 +136,20 @@ class BagsOperations {
   }
 
   static Future delete() async {
-    var result = await repository.getAll();
+    print('Pick an index to delete: ');
+    List<Bag> allBags = await repository.getAll();
+    for (int i = 0; i < allBags.length; i++) {
+      print('${i + 1}. ${allBags[i].description}');
+    }
 
-    switch (result) {
-      case Success(:var data):
-        print('Pick an index to delete: ');
-        List<Bag> allBags = data;
-        for (int i = 0; i < allBags.length; i++) {
-          print('${i + 1}. ${allBags[i].description}');
-        }
+    String? input = stdin.readLineSync();
 
-        String? input = stdin.readLineSync();
-
-        if (Validator.isIndex(input, allBags)) {
-          int index = int.parse(input!) - 1;
-          await repository.delete(allBags[index].id);
-          print('Bag deleted');
-        } else {
-          print('Invalid input');
-        }
-      case Failure(:var error):
-        print(error);
+    if (Validator.isIndex(input, allBags)) {
+      int index = int.parse(input!) - 1;
+      await repository.delete(allBags[index].id);
+      print('Bag deleted');
+    } else {
+      print('Invalid input');
     }
   }
 }
