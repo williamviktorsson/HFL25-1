@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-
+import 'package:server/models/bag_entity.dart';
 import 'package:server/repositories/bag_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:shelf/shelf.dart';
@@ -13,16 +13,20 @@ Future<Response> postBagHandler(Request request) async {
   final json = jsonDecode(data);
   var bag = Bag.fromJson(json);
 
-  bag = await repo.create(bag);
+  var bagEntity = await repo.create(bag.toEntity());
+
+  bag = await bagEntity.toModel();
 
   return Response.ok(
-    jsonEncode(bag),
+    jsonEncode(bag.toJson()),
     headers: {'Content-Type': 'application/json'},
   );
 }
 
 Future<Response> getBagsHandler(Request request) async {
-  final bags = await repo.getAll();
+  final entities = await repo.getAll();
+
+  final bags = await Future.wait(entities.map((e) => e.toModel()));
 
   final payload = bags.map((e) => e.toJson()).toList();
 
@@ -36,10 +40,12 @@ Future<Response> getBagHandler(Request request) async {
   String? id = request.params["id"];
 
   if (id != null) {
-    var bag = await repo.getById(id);
+    var entity = await repo.getById(id);
+
+    var bag = await entity?.toModel();
 
     return Response.ok(
-      jsonEncode(bag),
+      jsonEncode(bag?.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
   }
@@ -55,10 +61,12 @@ Future<Response> updateBagHandler(Request request) async {
     final data = await request.readAsString();
     final json = jsonDecode(data);
     Bag? bag = Bag.fromJson(json);
-    bag = await repo.update(id, bag);
+    var entity = bag.toEntity();
+    entity = await repo.update(id, entity);
+    bag = await entity.toModel();
 
     return Response.ok(
-      jsonEncode(bag),
+      jsonEncode(bag.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
   }
@@ -71,10 +79,12 @@ Future<Response> deleteBagHandler(Request request) async {
   String? id = request.params["id"];
 
   if (id != null) {
-    var bag = await repo.delete(id);
+    var entity = await repo.delete(id);
+
+    var bag = await entity.toModel();
 
     return Response.ok(
-      jsonEncode(bag),
+      jsonEncode(bag.toJson()),
       headers: {'Content-Type': 'application/json'},
     );
   }

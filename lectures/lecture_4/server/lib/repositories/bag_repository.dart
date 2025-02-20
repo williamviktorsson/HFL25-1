@@ -1,41 +1,24 @@
-import 'package:shared/shared.dart';
+import 'package:server/models/bag_entity.dart';
+import 'package:server/repositories/file_repository.dart';
 
-class BagRepository implements RepositoryInterface<Bag> {
-  // singleton
-
-
-  final List<Bag> _bags = [];
+class BagRepository extends FileRepository<BagEntity> {
+  BagRepository() : super('bags.json');
 
   @override
-  Future<Bag> create(Bag bag) async {
-    _bags.add(bag);
-    return bag;
+  BagEntity fromJson(Map<String, dynamic> json) {
+    // TODO: implement fromJson
+    return BagEntity.fromJson(json);
   }
 
   @override
-  Future<Bag> getById(String id) async {
-    return _bags.firstWhere((e) => e.id == id);
+  String idFromType(BagEntity bag) {
+    // TODO: implement idFromType
+    return bag.id;
   }
 
   @override
-  Future<List<Bag>> getAll() async => List.from(_bags);
-
-  @override
-  Future<Bag> update(String id, Bag newBag) async {
-    var index = _bags.indexWhere((e) => e.id == id);
-    if (index >= 0 && index < _bags.length) {
-      _bags[index] = newBag;
-      return newBag;
-    }
-    throw RangeError.index(index, _bags);
-  }
-
-  @override
-  Future<Bag> delete(String id) async {
-    var index = _bags.indexWhere((e) => e.id == id);
-    if (index >= 0 && index < _bags.length) {
-      return _bags.removeAt(index);
-    }
-    throw RangeError.index(index, _bags);
+  Map<String, dynamic> toJson(BagEntity bag) {
+    // TODO: implement toJson
+    return bag.toJson();
   }
 }
