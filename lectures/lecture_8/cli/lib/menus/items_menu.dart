@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:cli/cli_operations/items_operations.dart';
 import 'package:cli/utils/console.dart';

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:cli/utils/console.dart';
 import 'package:cli/menus/bags_menu.dart';

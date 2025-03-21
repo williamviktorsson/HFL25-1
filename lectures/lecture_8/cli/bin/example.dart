@@ -17,7 +17,7 @@ void main() async {
 
   // Get item by index
   Item? item = allItems.elementAt(0);
-  print('\nItem at index 0: ${item?.description}');
+  print('\nItem at index 0: ${item.description}');
 
   Item? item2 = allItems.elementAt(1);
 
