@@ -1,0 +1,6 @@
+- [ X ] Skapa en ChangeNotifier för AuthState
+- [  ] Skapa en första vy på appen som animerar mellan 2 olika vyer beroende på auth state
+- [ X ] Skapa en login vy
+- [  ] Som inloggad, använd LayoutBuilder för att byta mellan NavigationRail och NavigationBar beroende på storlek
+- [ X ] Använd IndexedStack för att preservera state mellan valbara vyer
+- [  ] Använd Hero widghet för att animera innehåll från en vy till en annan
