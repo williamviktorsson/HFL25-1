@@ -1,4 +1,6 @@
-
+import 'package:bloc_examples/blocs/auth_bloc.dart';
+import 'package:bloc_examples/blocs/counter_bloc.dart';
+import 'package:bloc_examples/blocs/weather_bloc.dart';
 import 'package:bloc_examples/views/counter_view.dart';
 import 'package:bloc_examples/views/weather_api_view.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +16,7 @@ class SimpleBlocObserver extends BlocObserver {
 
 void main() {
   Bloc.observer = SimpleBlocObserver();
-  // TODO 6: inject the authbloc into the app
-  runApp(const MyApp());
+  runApp(BlocProvider(create: (context) => AuthBloc(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,8 +24,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO 4: watch AuthBloc state and show appropriate view
-    // TODO 5: run the app
+    AuthState state = context.watch<AuthBloc>().state;
 
     return MaterialApp(
       title: 'Bloc Examples',
@@ -32,7 +32,18 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.redAccent),
         useMaterial3: true,
       ),
-      home: const SignedInView(),
+      home: switch (state) {
+        AuthPending() => const Material(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        AuthSuccess() => const SignedInView(),
+        AuthSignedOut() || AuthInitial() => const SignedOutView(),
+        AuthFail() => Center(
+            child: Text(state.error),
+          ),
+      },
     );
   }
 }
@@ -46,7 +57,7 @@ class SignedOutView extends StatelessWidget {
         body: Center(
       child: ElevatedButton(
         onPressed: () {
-          // TODO 7: dispatch sign in event to authbloc
+          context.read<AuthBloc>().login("william");
         },
         child: const Text("Login"),
       ),
@@ -61,10 +72,10 @@ class SignedInView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    // TODO 8: inject all blocs into the app
-
-    return  LandingPage();
+    return MultiBlocProvider(providers: [
+      BlocProvider(create: (context) => WeatherBloc()),
+      BlocProvider(create: (context) => CounterBloc())
+    ], child: LandingPage());
   }
 }
 
@@ -83,7 +94,6 @@ class LandingPage extends StatelessWidget {
       icon: Icon(Icons.calculate_outlined),
       label: "Counter",
     ),
-
     BottomNavigationBarItem(
       icon: Icon(Icons.settings),
       label: "Weather API",

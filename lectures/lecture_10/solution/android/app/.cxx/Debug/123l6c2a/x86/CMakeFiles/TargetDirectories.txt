@@ -1,0 +1,2 @@
+C:/Users/willi/work/HFL25-1/lectures/lecture_10/solution/android/app/.cxx/Debug/123l6c2a/x86/CMakeFiles/edit_cache.dir
+C:/Users/willi/work/HFL25-1/lectures/lecture_10/solution/android/app/.cxx/Debug/123l6c2a/x86/CMakeFiles/rebuild_cache.dir
