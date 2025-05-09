@@ -1,3 +1,4 @@
+import 'package:app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 
 class ExampleView extends StatelessWidget {
@@ -11,34 +12,26 @@ class ExampleView extends StatelessWidget {
   }
 }
 
-class ListTileExample extends StatefulWidget {
+class ListTileExample extends StatelessWidget {
   const ListTileExample({super.key});
 
-  @override
-  State<ListTileExample> createState() => _ListTileExampleState();
-}
-
-class _ListTileExampleState extends State<ListTileExample> {
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Custom List Item Sample')),
-      body: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text('Item $index'),
-            selected: index == _selectedIndex,
-            onTap: () {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          );
-        },
-      ),
-    );
+        appBar: AppBar(title: const Text('Custom List Item Sample')),
+        body: Center(
+          child: TextButton(
+              onPressed: () async {
+                final ns = await NotificationsService.instance;
+
+                ns.scheduleNotification(
+                    title: "App Name",
+                    content: "Parking about to expire",
+                    deliveryTime: DateTime.now().add(Duration(seconds: 3)),
+                    id: 0);
+              },
+              child: Text("Schedule Notificaiton")),
+        ));
   }
 }

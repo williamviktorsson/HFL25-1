@@ -41,17 +41,22 @@ dependencies:
 
   google_fonts: ^6.2.1
   provider: ^6.1.2
-  bloc: ^8.1.4
-  flutter_bloc: ^8.1.6
+  bloc: ^9.0.0
+  flutter_bloc: ^9.1.1
   mocktail: ^1.0.4
-  bloc_test: ^9.1.7
+  bloc_test: ^10.0.0
   equatable: ^2.0.7
-  hydrated_bloc: ^9.1.5
+  hydrated_bloc: ^10.0.0
   path_provider: ^2.1.5
-  replay_bloc: ^0.2.7
+  replay_bloc: ^0.3.0
   firebase_auth: ^5.5.2
   cloud_firestore: ^5.6.6
   firebase_core: ^3.13.0
+  flutter_local_notifications: ^19.1.0
+  timezone: ^0.10.1
+  flutter_timezone: ^4.1.0
+  intl: ^0.20.2
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +67,9 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: "^0.14.3"
+  msix: ^3.16.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -105,3 +112,15 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+msix_config:
+  display_name: STI App
+  identity_name: Com.Example.App
+  msix_version: 1.0.0.1
+  store: false
+  output_name: example
+  toast_activator:
+    clsid: "2559e0d4-553e-42b5-869c-7dc6dd5ca003"
+    arguments: "msix-args"
+    display_name: "STI App"
+  logo_path: C:\Users\willi\Downloads\launcher_bg.png

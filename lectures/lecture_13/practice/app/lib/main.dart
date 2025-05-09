@@ -5,6 +5,7 @@ import 'package:app/bloc/items/items_bloc.dart';
 import 'package:app/bloc/user/user_bloc.dart';
 import 'package:app/cubit/selected_item_cubit.dart';
 import 'package:app/repositories/item_repository.dart';
+import 'package:app/services/notification_service.dart';
 import 'package:app/views/example_view.dart';
 import 'package:app/views/items_view.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await NotificationsService.initialize();
 
   runApp(BlocProvider(
       create: (context) => AuthBloc()..add(AuthSubscribeToChanges()),
@@ -602,8 +605,8 @@ class NavRailView extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-            create: (context) =>
-                ItemsBloc(repository: ItemRepository())..add(SubScribeToItems())),
+            create: (context) => ItemsBloc(repository: ItemRepository())
+              ..add(SubScribeToItems())),
         BlocProvider(create: (context) => SelectedItemCubit())
       ],
       child: LayoutBuilder(builder: (context, constraints) {
