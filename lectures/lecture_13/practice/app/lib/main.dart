@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
       home: ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(
               dragDevices: {PointerDeviceKind.touch, PointerDeviceKind.mouse}),
-          child: const AuthViewSwitcher()),
+          child: ExampleView(index: 0,)),
     );
   }
 }

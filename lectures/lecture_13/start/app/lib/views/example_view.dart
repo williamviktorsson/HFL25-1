@@ -26,23 +26,21 @@ class ListTileExample extends StatelessWidget {
           child: TextButton(
               onPressed: () async {
                 final androidDetails = AndroidNotificationDetails(
-                  Uuid().v4(),
-                  "important_alarms",
-                  channelDescription:
-                      "Will only send super critical payment alerts on this channel!",
-                  importance: Importance.max,
-                  priority: Priority.high,
-                  color: Colors.amber,
-                  when: DateTime.now().add(Duration(seconds: 15)).millisecondsSinceEpoch,
-                  usesChronometer: true,
-                  chronometerCountDown: true
+                    Uuid().v4(), "important_alarms",
+                    channelDescription:
+                        "Will only send super critical payment alerts on this channel!",
+                    importance: Importance.max,
+                    priority: Priority.high,
+                    color: Colors.amber,
+                    when: DateTime.now()
+                        .add(Duration(seconds: 15))
+                        .millisecondsSinceEpoch,
+                    usesChronometer: true,
+                    chronometerCountDown: true);
 
-                );
-
-                NotificationDetails details =
-                    NotificationDetails(android: androidDetails,
-                    
-                    );
+                NotificationDetails details = NotificationDetails(
+                    android: androidDetails,
+                    macOS: DarwinNotificationDetails());
 
                 await requestPermissions();
 
