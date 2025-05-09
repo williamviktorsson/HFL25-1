@@ -23,15 +23,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         return windows;
       case TargetPlatform.linux:
@@ -70,6 +64,24 @@ class DefaultFirebaseOptions {
     projectId: 'fir-lecture-8a3a6',
     authDomain: 'fir-lecture-8a3a6.firebaseapp.com',
     storageBucket: 'fir-lecture-8a3a6.firebasestorage.app',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyA9aHfnnYJhueecOtjebdYinWV-LMko2XI',
+    appId: '1:287766812385:ios:a9b8d4c2074b7b6edd89a0',
+    messagingSenderId: '287766812385',
+    projectId: 'fir-lecture-8a3a6',
+    storageBucket: 'fir-lecture-8a3a6.firebasestorage.app',
+    iosBundleId: 'com.example.adminApp',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyA9aHfnnYJhueecOtjebdYinWV-LMko2XI',
+    appId: '1:287766812385:ios:a9b8d4c2074b7b6edd89a0',
+    messagingSenderId: '287766812385',
+    projectId: 'fir-lecture-8a3a6',
+    storageBucket: 'fir-lecture-8a3a6.firebasestorage.app',
+    iosBundleId: 'com.example.adminApp',
   );
 
 }

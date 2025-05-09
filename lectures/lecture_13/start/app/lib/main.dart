@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:app/bloc/auth/auth_bloc.dart';
@@ -7,13 +8,98 @@ import 'package:app/cubit/selected_item_cubit.dart';
 import 'package:app/repositories/item_repository.dart';
 import 'package:app/views/example_view.dart';
 import 'package:app/views/items_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'firebase_options.dart';
+
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
+
+Future<void> _configureLocalTimeZone() async {
+  if (kIsWeb || Platform.isLinux) {
+    return;
+  }
+  tz.initializeTimeZones();
+  if (Platform.isWindows) {
+    return;
+  }
+  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
+}
+
+Future<void> requestPermissions() async {
+  if (Platform.isIOS) {
+    final impl = notificationPlugin.resolvePlatformSpecificImplementation<
+        IOSFlutterLocalNotificationsPlugin>();
+    await impl?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  if (Platform.isMacOS) {
+    final impl = notificationPlugin.resolvePlatformSpecificImplementation<
+        MacOSFlutterLocalNotificationsPlugin>();
+    await impl?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  if (Platform.isAndroid) {
+    final impl = notificationPlugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+
+    await impl?.requestNotificationsPermission();
+  }
+}
+
+Future<FlutterLocalNotificationsPlugin> initializeNotifications() async {
+  // the plugin itself
+  var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  // platform specific settings
+  var initializationSettingsAndroid = const AndroidInitializationSettings(
+      '@drawable/ic_notification'); // TODO: Change this to an icon of your choice if you want to fix it.
+
+  var initializationSettingsDarwin =
+      const DarwinInitializationSettings(); // ios & macos
+
+  var initializationSettingsLinux =
+      const LinuxInitializationSettings(defaultActionName: 'Open notification');
+
+  const WindowsInitializationSettings initializationSettingsWindows =
+      WindowsInitializationSettings(
+          appName: 'App', // Your app name, sync msix installer in pubspec
+          appUserModelId:
+              'Com.Example.App', // app name, sync msix intaller in pubspec
+          guid:
+              '1c26bc72-e4e7-4098-b86f-3f6b97db8ff5'); // TODO: Generate your own: https://www.guidgenerator.com/ and sync in msix installer in pubspec
+
+  var initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+      macOS: initializationSettingsDarwin,
+      windows: initializationSettingsWindows,
+      linux: initializationSettingsLinux);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await _configureLocalTimeZone();
+  return flutterLocalNotificationsPlugin;
+}
+
+late FlutterLocalNotificationsPlugin notificationPlugin;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  notificationPlugin = await initializeNotifications();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -602,8 +688,8 @@ class NavRailView extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-            create: (context) =>
-                ItemsBloc(repository: ItemRepository())..add(SubScribeToItems())),
+            create: (context) => ItemsBloc(repository: ItemRepository())
+              ..add(SubScribeToItems())),
         BlocProvider(create: (context) => SelectedItemCubit())
       ],
       child: LayoutBuilder(builder: (context, constraints) {

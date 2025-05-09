@@ -24,6 +24,9 @@ Future<FlutterLocalNotificationsPlugin> initializeNotifications() async {
   var initializationSettingsAndroid = const AndroidInitializationSettings(
       '@drawable/ic_notification'); // TODO: Change this to an icon of your choice if you want to fix it.
   var initializationSettingsDarwin = const DarwinInitializationSettings();
+  var initializationSettingsLinux =
+  const LinuxInitializationSettings(defaultActionName: 'Open notification');
+
   const WindowsInitializationSettings initializationSettingsWindows =
       WindowsInitializationSettings(
           appName: 'STI App',
@@ -33,7 +36,8 @@ Future<FlutterLocalNotificationsPlugin> initializeNotifications() async {
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
       macOS: initializationSettingsDarwin,
-      windows: initializationSettingsWindows);
+      windows: initializationSettingsWindows,
+      linux: initializationSettingsLinux);
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   return flutterLocalNotificationsPlugin;
@@ -91,14 +95,11 @@ class NotificationsService {
         chronometerCountDown: true,
         usesChronometer: true);
 
-    var darwinPlatformChannelSpecifics = const DarwinNotificationDetails();
-    var windowsPlatformChannelSpecifics = WindowsNotificationDetails();
+    // no details needed for macos,linux,windows,ios, they will use defaults from init unless otherwise configured.
 
     var platformChannelSpecifics = NotificationDetails(
-        windows: windowsPlatformChannelSpecifics,
-        android: androidPlatformChannelSpecifics,
-        iOS: darwinPlatformChannelSpecifics,
-        macOS: darwinPlatformChannelSpecifics);
+      android: androidPlatformChannelSpecifics,
+    );
 
     // from docs, not sure about specifics
 

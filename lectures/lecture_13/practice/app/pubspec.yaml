@@ -116,7 +116,7 @@ flutter:
 msix_config:
   display_name: STI App
   identity_name: Com.Example.App
-  msix_version: 1.0.0.1
+  msix_version: 1.0.0.2
   store: false
   output_name: example
   toast_activator:
